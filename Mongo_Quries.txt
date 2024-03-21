@@ -1,0 +1,33 @@
+1. Go to your command prompt after installing mongo shell and mongo db, and write "mongosh" and hit enter
+2. If you want to show all the databases, then the command is :- show dbs;
+3. If you want to use a particular database, then the command is :- use <db_name>;
+4. If you want to show all the collections in the database, then the command is :- show collections;
+5. If you want to insert a document in the collection, then the command is :- db.<collection_name>.insertOne({_id: 1, name: "Pen", price: 1.20});
+6. If you want to insert many document in the collection, then the command is :- db.<collection_name>.insertMany({_id: 1, name: "Pen", price: 1.20}, {_id: 2, name: "Pencil", price: 0.80});
+7. If you want to see all the documents in the collection, then the command is :- db.<collection_name>.find();
+8. If you want to see all the documents at a certain condition in the collection, then the command is :- db.<collection_name>.find({attribute: value}); or db.<collection_name>.find({attribute: {$gt : value}}); or db.<collection_name>.find({attribute: {$lt : value}});
+***gt= greater than
+   lt=less than
+   gte= greater than equal
+   lte=less than equal
+9. If you want to update a document in a collection, then the command is :- db.<collection_name>.updateOne({_id: 1}, {$set: {attribute: new_value}});
+10. If you want to delete a document in a collection, then the command is :- db.<collection_name>.deleteOne({_id: 2});
+11. If you want to establish a relation using embeded document, then it will be like:-
+db.<collection_name>.insertOne({
+    _id: 2,
+    name: "Pencil",
+    price: 0.8,
+    stock: 12,
+    reviews:[
+        {
+            author_name: "Rupayan",
+            rating: 5,
+            review: "Very awesome pencil"
+        },
+        {
+            author_name: "Aditya",
+            rating: 5,
+            review: "Very good pencil"
+        }
+    ]
+});
