@@ -31,3 +31,4 @@ db.<collection_name>.insertOne({
         }
     ]
 });
+12. If you want to drop the database, then just switch into the database and write:- db.dropDatabase();

@@ -1,36 +1,81 @@
-const MongoClient = require('mongodb').MongoClient;
-const assert = require('assert');
+const mongoose = require("mongoose");
 
-// Connection URL
-const url = 'mongodb://localhost:27017';
+mongoose.connect("mongodb://localhost:27017/fruitsDB");
 
-// Database Name
-const dbName = 'fruitsDB';
-
-// Create a new MongoClient
-const client = new MongoClient(url);
-
-// Use connect method to connect to the Server
-client.connect(function(err) {
-  assert.equal(null, err);
-  console.log("Connected successfully to server");
-
-  const db = client.db(dbName);
-
-  client.close();
+const fruitSchema=new mongoose.Schema({
+  name: {
+    type: String, 
+    required: [true, "Please check your data entry, no name specified!"]
+  },
+  rating: {
+    type: Number,
+    min: 1, 
+    max: 10
+  },
+  review: String
 });
 
-const insertDocuments = function(db, callback) {
-  // Get the documents collection
-  const collection = db.collection('fruits');
-  // Insert some documents
-  collection.insertMany([
-    {a : 1}, {a : 2}, {a : 3}
-  ], function(err, result) {
-    assert.equal(err, null);
-    assert.equal(3, result.result.n);
-    assert.equal(3, result.ops.length);
-    console.log("Inserted 3 documents into the collection");
-    callback(result);
-  });
-}
+const Fruit = mongoose.model("Fruit", fruitSchema);
+
+//Insert Method
+const fruit = new Fruit({
+  name:"Apple",
+  rating: 7,
+  review: "Pretty solid as a fruit."
+});
+
+// fruit.save();
+
+const kiwi = new Fruit({
+  name:"Kiwi",
+  rating: 10,
+  review: "The best fruit!"
+});
+
+const orange = new Fruit({
+  name:"Orange",
+  rating: 4,
+  review: "Too sour for me"
+});
+
+const banana = new Fruit({
+  name:"Banana",
+  rating: 3,
+  review: "Weired texture"
+});
+
+// Fruit.insertMany([kiwi, orange, banana]);
+
+//Find Method
+async function dbQuries() {
+  try {
+    const fruitsAll = await Fruit.find({});
+    //Once we are done withh mongoose, then close the connection.
+    mongoose.connection.close();
+    fruitsAll.forEach((fruit)=>{
+      console.log(fruit.name);
+    })
+  } catch (err) {
+    console.log(err);
+  }
+};
+// dbQuries();
+
+
+
+
+//New Collection Created
+
+const personSchema=new mongoose.Schema({
+  name: String,
+  age: Number
+});
+
+const Person = mongoose.model("Person", personSchema);
+
+const person = new Person({
+  name:"Rupayan",
+  age: 21
+});
+
+// person.save();
