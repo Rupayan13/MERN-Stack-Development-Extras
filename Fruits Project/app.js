@@ -45,21 +45,52 @@ const banana = new Fruit({
 });
 
 // Fruit.insertMany([kiwi, orange, banana]);
+async function insertCollection() {
+  try {
+    const docs = await Fruit.insertMany([kiwi, orange, banana]);
+    console.log(docs);
+  } catch (err) {
+    console.log(err);
+  }
+};
+// insertCollection();
 
 //Find Method
-async function dbQuries() {
+async function readCollection() {
   try {
     const fruitsAll = await Fruit.find({});
     //Once we are done withh mongoose, then close the connection.
     mongoose.connection.close();
     fruitsAll.forEach((fruit)=>{
       console.log(fruit.name);
-    })
+    });
   } catch (err) {
     console.log(err);
   }
 };
-// dbQuries();
+// readCollection();
+
+//Update a document in the fruits collection
+async function updateCollection() {
+  try {
+    const docs = await Fruit.updateOne({_id: '65fe84f05c8960d64864f89d'}, {review: "Weired texture of it."});
+    console.log(docs);
+  } catch (err) {
+    console.log(err);
+  }
+};
+// updateCollection();
+
+//Delete a document in the fruits collection
+async function deleteCollection() {
+  try {
+    const docs = await Fruit.deleteOne({_id: '65fe84f05c8960d64864f89b'});
+    console.log(docs);
+  } catch (err) {
+    console.log(err);
+  }
+};
+// deleteCollection();
 
 
 
@@ -68,14 +99,35 @@ async function dbQuries() {
 
 const personSchema=new mongoose.Schema({
   name: String,
-  age: Number
+  age: Number,
+  favouriteFruit: fruitSchema 
 });
+
+//Create a relationship between people and fruits collection
+const pineapple = new Fruit({
+  name:"Pineapple",
+  rating: 9,
+  review: "Great fruit."
+});
+// pineapple.save();
 
 const Person = mongoose.model("Person", personSchema);
 
 const person = new Person({
   name:"Rupayan",
-  age: 21
+  age: 21,
+  favouriteFruit: pineapple
 });
 
 // person.save();
+
+//Delete some document in the fruits collection
+async function deleteSomeCollection() {
+  try {
+    const docs = await Person.deleteMany({ name: "Rupayan", age: { $gte: 18 } });
+    console.log(docs);
+  } catch (err) {
+    console.log(err);
+  }
+};
+// deleteSomeCollection();
