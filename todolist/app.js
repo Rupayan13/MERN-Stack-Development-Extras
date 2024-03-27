@@ -3,6 +3,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const lodash = require("lodash");
 
 const app = express();
 
@@ -49,8 +50,7 @@ const listSchema={
 
 const List = mongoose.model("List", listSchema);
 
-app.get("/", function(req, res) {
-  async function readCollection() {
+app.get("/", async function(req, res) {
     try {
       const itemsAll = await Item.find({});
       if(itemsAll.length===0){
@@ -62,14 +62,10 @@ app.get("/", function(req, res) {
     } catch (err) {
       console.log(err);
     }
-  };
-  readCollection();
 });
 
-app.get("/:customListName", function(req, res){
-  const customListName = req.params.customListName;
-
-  async function readCollection() {
+app.get("/:customListName", async function(req, res){
+  const customListName = lodash.capitalize(req.params.customListName);
     try {
       const foundList = await List.findOne({name: customListName});
       if(!foundList){
@@ -87,19 +83,21 @@ app.get("/:customListName", function(req, res){
     } catch (err) {
       console.log(err);
     }
-  };
-  readCollection();
 });
 
-app.post("/", function(req, res){
+app.post("/", async function(req, res){
 
   const itemName = req.body.newItem;
   const listName = req.body.list;
+
   const newItem=new Item({
     name: itemName
   });
 
-  async function readCollection() {
+  if(listName === "Today"){
+    newItem.save();
+    res.redirect("/");
+  }else{
     try {
       const foundList = await List.findOne({name: listName});
       foundList.items.push(newItem);
@@ -108,20 +106,14 @@ app.post("/", function(req, res){
     } catch (err) {
       console.log(err);
     }
-  };
-
-  if(listName === "Today"){
-    newItem.save();
-    res.redirect("/");
-  }else{
-    readCollection();
   }
 });
 
-app.post("/delete", function(req, res){
+app.post("/delete", async function(req, res){
   const checkItemId=req.body.checkbox;
-  const listName = req.body.list;
-  async function deleteTodayCollection() {
+  const listName = req.body.listName;
+
+  if(listName==="Today"){
     try {
       const docs = await Item.findByIdAndDelete(checkItemId);
       console.log(docs);
@@ -129,15 +121,15 @@ app.post("/delete", function(req, res){
     } catch (err) {
       console.log(err);
     }
-  };
-
-  if(listName==="Today"){
-    deleteTodayCollection();
+  }else{
+    try {
+      const docs = await List.findOneAndUpdate({name: listName}, {$pull: {items: {_id: checkItemId}}});
+      console.log(docs);
+      res.redirect("/"+listName);
+    } catch (err) {
+      console.log(err);
+    }
   }
-});
-
-app.get("/work", function(req,res){
-  res.render("list", {listTitle: "Work List", newListItems: workItems});
 });
 
 app.get("/about", function(req, res){
